@@ -13,4 +13,4 @@ COPY server.py /app/server.py
 ENV PORT=8080 DATA_DIR=/data RETENTION_HOURS=72 CHROME_BIN=/usr/bin/chromium
 VOLUME /data
 EXPOSE 8080
-CMD ["python3", "-I", "/app/server.py"]
+CMD ["python3", "/app/server.py"]

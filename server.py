@@ -23,6 +23,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from PIL import Image
 
+import templates
+
 PORT = int(os.environ.get("PORT", "8080"))
 DATA_DIR = os.environ.get("DATA_DIR", "/data")
 TOKEN = os.environ.get("TOKEN", "")
@@ -186,6 +188,20 @@ class Handler(BaseHTTPRequestHandler):
                 h = parse_dim(body.get("height"), 1350)
                 img_id = render_html(html, w, h)
                 return self.send_json(200, {"id": img_id, "url": public_url(self, img_id)})
+            if self.path == "/render-day":
+                # Recebe o conteudo do dia (texto) e devolve os links das artes prontas.
+                out = {"revisar": templates.revisar(body)}
+                car = body.get("carrossel") or {}
+                out["carrossel"] = [
+                    public_url(self, render_html(h, w, hh)) for (h, w, hh) in templates.slides_carrossel(car)
+                ]
+                out["imagem"] = [
+                    public_url(self, render_html(h, w, hh)) for (h, w, hh) in templates.post_imagem(body.get("imagem") or {})
+                ][0]
+                out["stories"] = [
+                    public_url(self, render_html(h, w, hh)) for (h, w, hh) in templates.post_stories(body.get("stories") or {})
+                ][0]
+                return self.send_json(200, out)
             if self.path == "/render-batch":
                 urls = []
                 for slide in body["slides"][:12]:
