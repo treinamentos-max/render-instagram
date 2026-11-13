@@ -1,0 +1,18 @@
+services:
+  render-instagram:
+    build: .
+    container_name: render-instagram
+    restart: unless-stopped
+    environment:
+      TOKEN: "${TOKEN}"                       # senha do servico (defina no arquivo .env)
+      PUBLIC_BASE_URL: "${PUBLIC_BASE_URL}"   # endereco publico, ex.: https://arte.seudominio.com.br
+      RETENTION_HOURS: "72"                   # apaga arquivos com mais de 72 horas
+    volumes:
+      - render_data:/data
+    ports:
+      - "127.0.0.1:8080:8080"                 # so acessivel de dentro da VPS (o proxy publica)
+    mem_limit: 700m
+    shm_size: 256m
+
+volumes:
+  render_data:
