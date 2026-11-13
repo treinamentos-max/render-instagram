@@ -8,7 +8,8 @@ COPY fonts/ /usr/share/fonts/poppins/
 RUN fc-cache -f
 
 WORKDIR /app
-COPY server.py /app/server.py
+COPY server.py templates.py /app/
+COPY assets/ /app/assets/
 
 ENV PORT=8080 DATA_DIR=/data RETENTION_HOURS=72 CHROME_BIN=/usr/bin/chromium
 VOLUME /data
