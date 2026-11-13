@@ -28,11 +28,11 @@ LIMITES = {
     "capa_sub": 70,
     "titulo": 24,
     "frase": 46,
-    "texto": 150,
-    "dica": 95,
+    "texto": 190,
+    "dica": 110,
     "alerta_item": 62,
     "final_titulo": 26,
-    "final_msg": 90,
+    "final_msg": 110,
     "img_titulo": 62,
     "img_texto": 230,
     "img_dica": 110,
@@ -70,15 +70,20 @@ def esc(value):
 
 
 def cortar(texto, chave):
-    """Corta no limite, preferindo terminar numa palavra inteira."""
+    """Corta no limite, preferindo terminar numa frase ou palavra inteira."""
     t = " ".join(str(texto or "").split())
     n = LIMITES[chave]
     if len(t) <= n:
         return t
-    t = t[:n]
-    if " " in t[n // 2:]:
-        t = t[: t.rfind(" ")]
-    return t.rstrip(" ,;:-") + "…"
+    corte = t[:n]
+    fim = max(corte.rfind(". "), corte.rfind("! "), corte.rfind("? "))
+    if fim >= n * 0.4:
+        return corte[: fim + 1]
+    if corte.endswith((".", "!", "?")):
+        return corte
+    if " " in corte[n // 2:]:
+        corte = corte[: corte.rfind(" ")]
+    return corte.rstrip(" ,;:-") + "…"
 
 
 def logo_img(size):
