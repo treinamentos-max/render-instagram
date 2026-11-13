@@ -30,6 +30,7 @@ PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "").rstrip("/")
 RETENTION_HOURS = float(os.environ.get("RETENTION_HOURS", "72"))
 MAX_BODY = 6 * 1024 * 1024
 MAX_DIM = 4000
+EXTRA_HEIGHT = 300
 JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "92"))
 
 ID_RE = re.compile(r"^[0-9a-f]{24}$")
@@ -70,7 +71,9 @@ def render_html(html, width, height):
             "--default-background-color=FFFFFFFF",
             "--virtual-time-budget=3000",
             "--user-data-dir=" + os.path.join(tmp, "profile"),
-            "--window-size=%d,%d" % (width, height),
+            # Janela maior que a arte: alguns Chromium headless entregam uma area
+            # menor que a pedida. Depois recortamos exatamente width x height.
+            "--window-size=%d,%d" % (width, height + EXTRA_HEIGHT),
             "--screenshot=" + png_path,
             "file://" + html_path,
         ]
@@ -78,10 +81,11 @@ def render_html(html, width, height):
         if not os.path.exists(png_path):
             raise RuntimeError("Falha ao renderizar: " + proc.stderr.decode("utf-8", "ignore")[-300:])
         img = Image.open(png_path).convert("RGB")
-        if img.size != (width, height):
-            canvas = Image.new("RGB", (width, height), "white")
-            canvas.paste(img.crop((0, 0, min(width, img.width), min(height, img.height))), (0, 0))
-            img = canvas
+        if img.width < width or img.height < height:
+            raise RuntimeError(
+                "Captura menor que o pedido (%dx%d < %dx%d)" % (img.width, img.height, width, height)
+            )
+        img = img.crop((0, 0, width, height))
         img.save(out_path, "JPEG", quality=JPEG_QUALITY, optimize=True)
     return img_id
 
