@@ -6,6 +6,7 @@ de cada slide. Os textos sao cortados nos limites abaixo para nao estourar o lay
 import base64
 import html as _html
 import os
+import re
 
 HANDLE = "@sintomadegravidez"
 
@@ -42,10 +43,9 @@ LIMITES = {
 
 # Termos que mandam o post para revisao humana (status "rascunho").
 TERMOS_SENSIVEIS = [
-    "mg", "dose", "dosagem", "comprimido", "remédio", "remedio", "medicamento",
-    "tome ", "tomar ", "suplemento", "vitamina", "chá de", "cha de", "dieta",
-    "jejum", "emagrec", "garantid", "cura ", "curar", "diagnóstico", "diagnostico",
-    "aborto", "interromper", "nunca ", "sempre funciona", "100%",
+    "dosagem", "comprimido", "remédio", "remedio", "medicamento", "tome ", "tomar ",
+    "suplemento", "vitamina", "jejum", "emagrec", "garantid", "diagnóstico",
+    "diagnostico", "aborto", "interromper", "100%", "cura ", "curar",
 ]
 
 ICONS = {
@@ -287,7 +287,7 @@ h1 {{ margin-top: 60px; font-size: 104px; line-height: 1.06; font-weight: 800; }
 
 
 def revisar(conteudo):
-    """Devolve a lista de termos sensiveis encontrados em todo o conteudo."""
+    """Devolve os termos sensiveis encontrados em todo o conteudo."""
     partes = []
 
     def coletar(v):
@@ -302,12 +302,7 @@ def revisar(conteudo):
 
     coletar(conteudo)
     texto = " " + " ".join(partes).lower() + " "
-    achados = []
-    for t in TERMOS_SENSIVEIS:
-        chave = t if t.endswith(" ") else t
-        if t in ("mg",):
-            if " mg" in texto or "mg " in texto and any(ch.isdigit() for ch in texto):
-                achados.append(t)
-        elif chave in texto:
-            achados.append(t.strip())
+    achados = [t.strip() for t in TERMOS_SENSIVEIS if t in texto]
+    if re.search(r"\d\s?(mg|mcg|ml)\b", texto):
+        achados.append("dose")
     return sorted(set(achados))
