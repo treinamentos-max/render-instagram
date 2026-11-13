@@ -302,7 +302,8 @@ def revisar(conteudo):
 
     coletar(conteudo)
     texto = " " + " ".join(partes).lower() + " "
-    achados = [t.strip() for t in TERMOS_SENSIVEIS if t in texto]
+    achados = [t.strip() for t in TERMOS_SENSIVEIS
+               if re.search(r"(?<![a-zà-ú])" + re.escape(t.strip()) + r"(?![a-zà-ú])", texto)]
     if re.search(r"\d\s?(mg|mcg|ml)\b", texto):
         achados.append("dose")
     return sorted(set(achados))
