@@ -93,13 +93,20 @@ def render_html(html, width, height):
 
 
 def foto_data_uri(b64):
-    """Converte a foto (base64, PNG/JPEG) em JPEG leve embutido no HTML. None se invalida."""
+    """Converte a foto (base64 ou link do Pexels) em JPEG leve embutido no HTML. None se falhar."""
     if not b64:
         return None
     try:
         import base64
         import io
-        img = Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
+        if str(b64).startswith("https://images.pexels.com/"):
+            import urllib.request
+            req = urllib.request.Request(b64, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                dados = resp.read(12 * 1024 * 1024)
+        else:
+            dados = base64.b64decode(b64)
+        img = Image.open(io.BytesIO(dados)).convert("RGB")
         if img.width > 1400:
             img = img.resize((1400, int(img.height * 1400 / img.width)))
         buf = io.BytesIO()
