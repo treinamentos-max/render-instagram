@@ -30,7 +30,7 @@ DATA_DIR = os.environ.get("DATA_DIR", "/data")
 TOKEN = os.environ.get("TOKEN", "")
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "").rstrip("/")
 RETENTION_HOURS = float(os.environ.get("RETENTION_HOURS", "72"))
-MAX_BODY = 6 * 1024 * 1024
+MAX_BODY = 40 * 1024 * 1024
 MAX_DIM = 4000
 EXTRA_HEIGHT = 300
 JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "92"))
@@ -90,6 +90,23 @@ def render_html(html, width, height):
         img = img.crop((0, 0, width, height))
         img.save(out_path, "JPEG", quality=JPEG_QUALITY, optimize=True)
     return img_id
+
+
+def foto_data_uri(b64):
+    """Converte a foto (base64, PNG/JPEG) em JPEG leve embutido no HTML. None se invalida."""
+    if not b64:
+        return None
+    try:
+        import base64
+        import io
+        img = Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGB")
+        if img.width > 1400:
+            img = img.resize((1400, int(img.height * 1400 / img.width)))
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=88, optimize=True)
+        return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def public_url(handler, img_id):
@@ -190,8 +207,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_json(200, {"id": img_id, "url": public_url(self, img_id)})
             if self.path == "/render-day":
                 # Recebe o conteudo do dia (texto) e devolve os links das artes prontas.
+                fotos = body.pop("fotos", None) or {}
                 out = {"revisar": templates.revisar(body)}
                 car = body.get("carrossel") or {}
+                for nome, bloco in (("capa", car), ("imagem", body.get("imagem")), ("stories", body.get("stories"))):
+                    uri = foto_data_uri(fotos.get(nome))
+                    if uri and isinstance(bloco, dict):
+                        bloco["foto"] = uri
+                out["fotos_usadas"] = sorted(n for n in fotos if fotos.get(n))
                 out["carrossel"] = [
                     public_url(self, render_html(h, w, hh)) for (h, w, hh) in templates.slides_carrossel(car)
                 ]
