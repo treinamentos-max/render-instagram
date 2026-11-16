@@ -44,7 +44,8 @@ LIMITES = {
 # Termos que mandam o post para revisao humana (status "rascunho").
 TERMOS_SENSIVEIS = [
     "dosagem", "comprimido", "remédio", "remedio", "medicamento", "tome ", "tomar ",
-    "suplemento", "vitamina", "jejum", "emagrec", "garantid", "diagnóstico",
+    "suplemento", "vitamina", "jejum", "emagrec", "garantimos", "resultado garantido", "resultados garantidos",
+    "sucesso garantido", "eficácia garantida", "diagnóstico",
     "diagnostico", "aborto", "interromper", "100%", "cura ", "curar",
 ]
 
