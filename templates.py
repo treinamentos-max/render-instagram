@@ -166,6 +166,10 @@ MASCARA_CSS = r"""
 .graos { position: absolute; inset: 0; opacity: .2; mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
 .moldura { position: absolute; inset: 26px; border: 3px solid rgba(255,255,255,.78); border-radius: 46px; }
 """
+# Seta desenhada em SVG (a fonte do servidor nao tem o glifo da seta e mostrava um quadrado vazio).
+SETA = ('<svg width="34" height="22" viewBox="0 0 34 22" style="vertical-align:middle;margin-left:8px">'
+        '<path d="M2 11h26M20 3l9 8-9 8" fill="none" stroke="currentColor" stroke-width="3.5" '
+        'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 MASCARA_HTML = ('<div class="tinta"></div><div class="tom"></div><div class="pontos"></div>'
                 '<div class="graos"></div><div class="moldura"></div>')
 
@@ -190,7 +194,7 @@ h1 span {{ color: #FFC2DE; }}
   <div class="base">
     <h1>{esc(cortar(c.get('capa_titulo'), 'capa_titulo'))} <span>{esc(cortar(c.get('capa_destaque'), 'capa_destaque'))}</span></h1>
     <div class="sub">{esc(cortar(c.get('capa_sub'), 'capa_sub'))}</div>
-    <div class="footer2">{handle_html()}<span>Deslize &rarr;</span></div>
+    <div class="footer2">{handle_html()}<span>Deslize {SETA}</span></div>
   </div>
 </div></div></body></html>"""
 
@@ -217,7 +221,7 @@ h1 span {{ color: {PINK}; }}
   <h1>{esc(cortar(c.get('capa_titulo'), 'capa_titulo'))} <span>{esc(cortar(c.get('capa_destaque'), 'capa_destaque'))}</span></h1>
   <div class="sub">{esc(cortar(c.get('capa_sub'), 'capa_sub'))}</div>
   <div class="arte">{selo}</div>
-  <div class="footer2">{handle_html()}<span>Deslize &rarr;</span></div>
+  <div class="footer2">{handle_html()}<span>Deslize {SETA}</span></div>
 </div></div></body></html>"""
 
 
@@ -245,7 +249,7 @@ h1 {{ font-size: 80px; line-height: 1.05; color: {WINE}; font-weight: 800; margi
   <div class="quote">“{esc(cortar(item.get('frase'), 'frase'))}”</div>
   <div class="body">{esc(cortar(item.get('texto'), 'texto'))}</div>
   <div class="tip"><b>Ajuda:</b> {esc(cortar(item.get('dica'), 'dica'))}</div>
-  <div class="footer">{handle_html()}<span>Deslize &rarr;</span></div>
+  <div class="footer">{handle_html()}<span>Deslize {SETA}</span></div>
 </div></div></body></html>"""
 
 
@@ -274,7 +278,7 @@ li {{ display: flex; gap: 24px; align-items: center; font-size: 34px; line-heigh
   <div class="linha"><h1>Quando é hora de <span>falar com o médico</span></h1>{selo}</div>
   <ul>{lis}</ul>
   <div class="close">Na dúvida, procure atendimento. Perguntar nunca é exagero.</div>
-  <div class="footer">{handle_html()}<span>Deslize &rarr;</span></div>
+  <div class="footer">{handle_html()}<span>Deslize {SETA}</span></div>
 </div></div></body></html>"""
 
 
