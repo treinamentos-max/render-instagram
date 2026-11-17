@@ -156,6 +156,19 @@ def confete(cores=None, n=10, semente=1):
 PADRAO_PONTOS = ("background-image: radial-gradient(rgba(196,82,138,.13) 3.5px, transparent 3.5px);"
                  "background-size: 46px 46px;")
 
+# Mascara de marca aplicada SEMPRE por cima das fotos, para nao parecerem fotos de banco de imagens:
+# tom rosado/azulado da marca, trama de pontos, granulacao e moldura fina.
+MASCARA_CSS = r"""
+.foto { filter: saturate(.8) contrast(1.07) brightness(.97) sepia(.1); }
+.tinta { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(244,198,220,.62) 0%, rgba(196,82,138,.30) 48%, rgba(173,220,245,.5) 100%); mix-blend-mode: soft-light; }
+.tom { position: absolute; inset: 0; background: rgba(196,82,138,.10); mix-blend-mode: multiply; }
+.pontos { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.5) 3px, transparent 3.5px); background-size: 46px 46px; -webkit-mask-image: linear-gradient(135deg, #000 0%, transparent 38%); mask-image: linear-gradient(135deg, #000 0%, transparent 38%); }
+.graos { position: absolute; inset: 0; opacity: .2; mix-blend-mode: overlay; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.moldura { position: absolute; inset: 26px; border: 3px solid rgba(255,255,255,.78); border-radius: 46px; }
+"""
+MASCARA_HTML = ('<div class="tinta"></div><div class="tom"></div><div class="pontos"></div>'
+                '<div class="graos"></div><div class="moldura"></div>')
+
 
 def capa_foto(c, total):
     return f"""
@@ -163,6 +176,7 @@ def capa_foto(c, total):
 body {{ background: {WINE}; color: white; }}
 .foto {{ position: absolute; inset: 0; background: url('{c.get("foto")}') center/cover no-repeat; }}
 .veu {{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(74,35,64,.55) 0%, rgba(74,35,64,0) 24%, rgba(74,35,64,.35) 44%, rgba(74,35,64,.93) 78%, rgba(74,35,64,.97) 100%); }}
+{MASCARA_CSS}
 .pill2 {{ padding: 14px 30px; border-radius: 999px; background: {PINK}; color: white; font-size: 28px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }}
 .base {{ margin-top: auto; }}
 h1 {{ font-size: 100px; line-height: 1.04; font-weight: 800; letter-spacing: -2px; text-shadow: 0 4px 24px rgba(0,0,0,.35); }}
@@ -170,7 +184,7 @@ h1 span {{ color: #FFC2DE; }}
 .sub {{ margin-top: 26px; font-size: 40px; line-height: 1.3; font-weight: 500; opacity: .95; }}
 .footer2 {{ margin-top: 40px; display: flex; justify-content: space-between; align-items: center; font-size: 28px; font-weight: 600; }}
 </style></head><body>
-<div class="slide"><div class="foto"></div><div class="veu"></div>
+<div class="slide"><div class="foto"></div><div class="veu"></div>{MASCARA_HTML}
 <div class="content">
   <div style="display:flex;justify-content:space-between;align-items:center"><div class="pill2">{esc(cortar(c.get('etiqueta'), 'etiqueta'))}</div>{logo_img(120)}</div>
   <div class="base">
@@ -308,6 +322,7 @@ def post_imagem_foto(c):
 body {{ background: {WINE}; color: {WINE}; }}
 .foto {{ position: absolute; inset: 0; background: url('{c.get("foto")}') center 12%/cover no-repeat; }}
 .veu {{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(74,35,64,.5) 0%, rgba(74,35,64,0) 26%, rgba(74,35,64,0) 55%, rgba(74,35,64,.45) 100%); }}
+{MASCARA_CSS}
 .cartao {{ position: absolute; left: 50px; right: 50px; bottom: 50px; background: rgba(255,255,255,.96); border-radius: 50px; padding: 44px 50px 36px; box-shadow: 0 24px 60px rgba(74,35,64,.35); }}
 h1 {{ font-size: 62px; line-height: 1.07; font-weight: 800; color: {WINE}; }}
 .texto {{ margin-top: 20px; font-size: 33px; line-height: 1.4; color: {TEXT}; }}
@@ -316,7 +331,7 @@ h1 {{ font-size: 62px; line-height: 1.07; font-weight: 800; color: {WINE}; }}
 .rod {{ margin-top: 22px; display: flex; justify-content: space-between; align-items: center; font-size: 23px; font-weight: 600; color: {PINK}; }}
 .note {{ font-size: 19px; color: {TEXT}; opacity: .7; margin-top: 12px; }}
 </style></head><body>
-<div class="slide" style="padding:0"><div class="foto"></div><div class="veu"></div>
+<div class="slide" style="padding:0"><div class="foto"></div><div class="veu"></div>{MASCARA_HTML}
 <div style="position:absolute;left:80px;right:80px;top:70px;display:flex;justify-content:space-between;align-items:center;z-index:2"><span class="pill" style="font-size:26px;font-weight:600;letter-spacing:3px">{esc(cortar(c.get('etiqueta'), 'etiqueta'))}</span>{logo_img(104)}</div>
 <div class="cartao">
   <h1>{esc(cortar(c.get('titulo'), 'img_titulo'))}</h1>
@@ -362,6 +377,7 @@ def post_stories_foto(c):
 body {{ background: {WINE}; color: {WINE}; }}
 .foto {{ position: absolute; inset: 0; background: url('{c.get("foto")}') center/cover no-repeat; }}
 .veu {{ position: absolute; inset: 0; background: linear-gradient(180deg, rgba(74,35,64,.55) 0%, rgba(74,35,64,0) 22%, rgba(74,35,64,0) 50%, rgba(74,35,64,.55) 100%); }}
+{MASCARA_CSS}
 .pill2 {{ padding: 16px 34px; border-radius: 999px; background: {PINK}; color: white; font-size: 32px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }}
 .cartao {{ margin-top: auto; background: rgba(255,255,255,.95); border-radius: 56px; padding: 52px 54px 44px; box-shadow: 0 30px 80px rgba(74,35,64,.4); }}
 h1 {{ font-size: 76px; line-height: 1.06; font-weight: 800; color: {WINE}; }}
@@ -370,7 +386,7 @@ h1 {{ font-size: 76px; line-height: 1.06; font-weight: 800; color: {WINE}; }}
 .nota {{ margin-top: 20px; font-size: 22px; color: {TEXT}; opacity: .7; }}
 .brand {{ margin-top: 26px; font-size: 32px; font-weight: 600; color: white; text-shadow: 0 2px 12px rgba(0,0,0,.4); }}
 </style></head><body>
-<div class="slide"><div class="foto"></div><div class="veu"></div>
+<div class="slide"><div class="foto"></div><div class="veu"></div>{MASCARA_HTML}
 <div class="content">
   <div style="display:flex;justify-content:space-between;align-items:center"><div class="pill2">{esc(cortar(c.get('etiqueta'), 'etiqueta'))}</div>{logo_img(140)}</div>
   <div class="cartao">
